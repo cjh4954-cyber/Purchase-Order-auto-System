@@ -5,7 +5,8 @@ import type {
   InventoryItem,
   PurchaseOrder,
   PurchaseOrderItem,
-  Supplier
+  Supplier,
+  ClientPartner
 } from '../types/scm'
 
 /**
@@ -258,3 +259,98 @@ export function exportInventoryToExcel(inventory: InventoryItem[]) {
   XLSX.utils.book_append_sheet(wb, ws, '재고현황')
   XLSX.writeFile(wb, `무인민원발급기_부자재_재고현황_${new Date().toISOString().slice(0, 10)}.xlsx`)
 }
+
+/**
+ * 매출거래처(고객사) 목록 엑셀 다운로드
+ */
+export function exportClientsToExcel(clients: ClientPartner[]) {
+  const wb = XLSX.utils.book_new()
+  const data = [
+    ['한국타피(주) 매출거래처 (고객사/발주처) 관리대장'],
+    ['출력일시: ' + new Date().toLocaleString('ko-KR')],
+    [''],
+    ['거래처코드', '고객사(기관명)', '사업자번호', '대표자', '구분', '부서', '담당자', '연락처', '이메일', '사업장/납품주소', '비고']
+  ]
+
+  clients.forEach((c) => {
+    data.push([
+      c.code,
+      c.name,
+      c.businessNo,
+      c.ceo,
+      c.category,
+      c.department || '',
+      c.manager,
+      c.contact,
+      c.email,
+      c.address,
+      c.note || ''
+    ])
+  })
+
+  const ws = XLSX.utils.aoa_to_sheet(data)
+  ws['!cols'] = [
+    { wch: 14 },
+    { wch: 25 },
+    { wch: 16 },
+    { wch: 14 },
+    { wch: 12 },
+    { wch: 18 },
+    { wch: 14 },
+    { wch: 16 },
+    { wch: 25 },
+    { wch: 45 },
+    { wch: 30 }
+  ]
+
+  XLSX.utils.book_append_sheet(wb, ws, '매출거래처')
+  XLSX.writeFile(wb, `매출거래처_관리대장_${new Date().toISOString().slice(0, 10)}.xlsx`)
+}
+
+/**
+ * 매입거래처(협력사) 목록 엑셀 다운로드
+ */
+export function exportSuppliersToExcel(suppliers: Supplier[]) {
+  const wb = XLSX.utils.book_new()
+  const data = [
+    ['한국타피(주) 매입거래처 (원자재/부품 공급 협력사) 관리대장'],
+    ['출력일시: ' + new Date().toLocaleString('ko-KR')],
+    [''],
+    ['업체코드', '협력사명', '사업자번호', '대표자', '품목카테고리', '표준리드타임', '담당자', '전화번호', '이메일', '사업장주소', '결제조건/은행']
+  ]
+
+  suppliers.forEach((s) => {
+    data.push([
+      s.code || s.id,
+      s.name,
+      s.businessNo,
+      s.ceo,
+      s.category,
+      `${s.leadTimeDays}일`,
+      s.manager || '담당자',
+      s.contact,
+      s.email,
+      s.address || '-',
+      s.paymentTerms || '익월 말 현금'
+    ])
+  })
+
+  const ws = XLSX.utils.aoa_to_sheet(data)
+  ws['!cols'] = [
+    { wch: 12 },
+    { wch: 28 },
+    { wch: 16 },
+    { wch: 14 },
+    { wch: 20 },
+    { wch: 12 },
+    { wch: 14 },
+    { wch: 16 },
+    { wch: 25 },
+    { wch: 35 },
+    { wch: 20 }
+  ]
+
+  XLSX.utils.book_append_sheet(wb, ws, '매입거래처')
+  XLSX.writeFile(wb, `매입거래처_관리대장_${new Date().toISOString().slice(0, 10)}.xlsx`)
+}
+

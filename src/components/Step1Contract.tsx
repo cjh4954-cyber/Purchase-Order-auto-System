@@ -9,12 +9,13 @@ import {
   ArrowRight,
   Sparkles
 } from 'lucide-react'
-import type { ContractOrder, ModelCode } from '../types/scm'
+import type { ContractOrder, ModelCode, ClientPartner } from '../types/scm'
 import { MODELS_INFO } from '../data/bomData'
 
 interface Step1ContractProps {
   contracts: ContractOrder[]
   selectedContractIds: string[]
+  clients?: ClientPartner[]
   onToggleContractSelect: (id: string) => void
   onAddContract: (newContract: ContractOrder) => void
   onDeleteContract: (id: string) => void
@@ -24,6 +25,7 @@ interface Step1ContractProps {
 export const Step1Contract: React.FC<Step1ContractProps> = ({
   contracts,
   selectedContractIds,
+  clients = [],
   onToggleContractSelect,
   onAddContract,
   onDeleteContract,
@@ -49,6 +51,17 @@ export const Step1Contract: React.FC<Step1ContractProps> = ({
     'TAPI-9320J': 1,
     'TAPI-9320T': 0
   })
+
+  const handleSelectClient = (clientId: string) => {
+    if (!clientId) return
+    const selected = clients.find((c) => c.id === clientId)
+    if (selected) {
+      setClientName(selected.name)
+      setManager(selected.manager)
+      setManagerContact(selected.contact)
+      setMemo(`납품처: ${selected.address} (${selected.department || ''})`)
+    }
+  }
 
   const updateQuantity = (code: ModelCode, delta: number) => {
     setQuantities((prev) => ({
@@ -165,6 +178,27 @@ export const Step1Contract: React.FC<Step1ContractProps> = ({
           </div>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+            {/* 등록된 매출거래처 빠른 선택 */}
+            {clients.length > 0 && (
+              <div className="p-3.5 bg-blue-50/60 border border-blue-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5 shrink-0">
+                  🏢 등록된 매출거래처(고객사)에서 정보 불러오기:
+                </span>
+                <select
+                  onChange={(e) => handleSelectClient(e.target.value)}
+                  defaultValue=""
+                  className="px-3 py-1.5 bg-white border border-blue-300 rounded-lg text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                >
+                  <option value="">-- 직접 입력 또는 고객사 선택 --</option>
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      [{c.category}] {c.name} ({c.manager} / {c.contact})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* 기본 계약 정보 */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>

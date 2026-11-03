@@ -4,27 +4,32 @@ import { Step1Contract } from './components/Step1Contract'
 import { Step2Inventory } from './components/Step2Inventory'
 import { Step3PurchaseOrder } from './components/Step3PurchaseOrder'
 import { Step4BomViewer } from './components/Step4BomViewer'
-import { INITIAL_CONTRACTS } from './data/bomData'
-import type { ContractOrder, PurchaseOrder } from './types/scm'
+import { StepPartnerManagement } from './components/StepPartnerManagement'
+import { INITIAL_CONTRACTS, INITIAL_SUPPLIERS, INITIAL_CLIENTS } from './data/bomData'
+import type { ContractOrder, PurchaseOrder, ClientPartner, Supplier } from './types/scm'
 import {
   calculateRequiredParts,
   generatePurchaseOrders
 } from './utils/scmCalculations'
 
 export default function App() {
-  const [activeStep, setActiveStep] = useState<1 | 2 | 3 | 4>(1)
+  const [activeStep, setActiveStep] = useState<1 | 2 | 3 | 4 | 5>(1)
 
-  // 1. 계약서 목록 및 선택 상태
+  // 1. 거래처 목록 상태 (매출거래처 / 매입거래처)
+  const [clients, setClients] = useState<ClientPartner[]>(INITIAL_CLIENTS)
+  const [suppliers, setSuppliers] = useState<Supplier[]>(INITIAL_SUPPLIERS)
+
+  // 2. 계약서 목록 및 선택 상태
   const [contracts, setContracts] = useState<ContractOrder[]>(INITIAL_CONTRACTS)
   const [selectedContractIds, setSelectedContractIds] = useState<string[]>(() =>
     INITIAL_CONTRACTS.map((c) => c.id)
   )
 
-  // 2. 현재고 수량 수정값 상태 (partId -> stock)
+  // 3. 현재고 수량 수정값 상태 (partId -> stock)
   const [stockOverrides, setStockOverrides] = useState<Record<string, number>>({})
   const [includeSafetyStock, setIncludeSafetyStock] = useState<boolean>(true)
 
-  // 3. 발주서 상태 맵 (orderId -> '발주대기' | '발주완료')
+  // 4. 발주서 상태 맵 (supplierId -> '발주대기' | '발주완료')
   const [orderStatusMap, setOrderStatusMap] = useState<Record<string, '발주대기' | '발주완료'>>({})
 
   // 선택된 계약서 목록
@@ -47,7 +52,7 @@ export default function App() {
 
   // 3단계: 거래처별 발주서 자동 생성
   const purchaseOrders = useMemo<PurchaseOrder[]>(() => {
-    const rawOrders = generatePurchaseOrders(inventory, undefined, contractRefTitle)
+    const rawOrders = generatePurchaseOrders(inventory, suppliers, contractRefTitle)
     // 수동 상태 보존
     return rawOrders.map((o) => {
       const savedStatus = orderStatusMap[o.supplier.id] || o.status
@@ -56,7 +61,7 @@ export default function App() {
         status: savedStatus
       }
     })
-  }, [inventory, contractRefTitle, orderStatusMap])
+  }, [inventory, suppliers, contractRefTitle, orderStatusMap])
 
   // 계약서 토글 핸들러
   const handleToggleContractSelect = (id: string) => {
@@ -112,9 +117,39 @@ export default function App() {
     setOrderStatusMap(updated)
   }
 
+  // 거래처 관리 CRUD 핸들러
+  const handleAddClient = (newClient: ClientPartner) => {
+    setClients((prev) => [newClient, ...prev])
+  }
+
+  const handleUpdateClient = (updatedClient: ClientPartner) => {
+    setClients((prev) =>
+      prev.map((c) => (c.id === updatedClient.id ? updatedClient : c))
+    )
+  }
+
+  const handleDeleteClient = (id: string) => {
+    setClients((prev) => prev.filter((c) => c.id !== id))
+  }
+
+  const handleAddSupplier = (newSupplier: Supplier) => {
+    setSuppliers((prev) => [newSupplier, ...prev])
+  }
+
+  const handleUpdateSupplier = (updatedSupplier: Supplier) => {
+    setSuppliers((prev) =>
+      prev.map((s) => (s.id === updatedSupplier.id ? updatedSupplier : s))
+    )
+  }
+
+  const handleDeleteSupplier = (id: string) => {
+    setSuppliers((prev) => prev.filter((s) => s.id !== id))
+  }
+
   // 통계 수치
   const shortageCount = inventory.filter((i) => i.shortageQty > 0).length
   const pendingOrdersCount = purchaseOrders.filter((o) => o.status === '발주대기').length
+  const totalPartnerCount = clients.length + suppliers.length
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-800 flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white">
@@ -125,6 +160,7 @@ export default function App() {
         contractCount={contracts.length}
         shortageCount={shortageCount}
         pendingOrderCount={pendingOrdersCount}
+        partnerCount={totalPartnerCount}
       />
 
       {/* Main Container */}
@@ -133,6 +169,7 @@ export default function App() {
           <Step1Contract
             contracts={contracts}
             selectedContractIds={selectedContractIds}
+            clients={clients}
             onToggleContractSelect={handleToggleContractSelect}
             onAddContract={handleAddContract}
             onDeleteContract={handleDeleteContract}
@@ -160,14 +197,27 @@ export default function App() {
           />
         )}
 
-        {activeStep === 4 && <Step4BomViewer />}
+        {activeStep === 4 && (
+          <StepPartnerManagement
+            clients={clients}
+            suppliers={suppliers}
+            onAddClient={handleAddClient}
+            onUpdateClient={handleUpdateClient}
+            onDeleteClient={handleDeleteClient}
+            onAddSupplier={handleAddSupplier}
+            onUpdateSupplier={handleUpdateSupplier}
+            onDeleteSupplier={handleDeleteSupplier}
+          />
+        )}
+
+        {activeStep === 5 && <Step4BomViewer />}
       </main>
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>한국타피(주) SCM 무인민원발급기 자동 발주 관리 시스템</span>
-          <span>기준 문서: 무인민원발급기_부자재목록 (TAPI-9270J/9270T/9320J/9320T)</span>
+          <span>매출거래처(지자체/공공기관) & 매입거래처(부품협력사) 통합 관리</span>
         </div>
       </footer>
     </div>

@@ -1,4 +1,4 @@
-import type { ModelCode, ModelInfo, BomPart, Supplier, MasterPart, ContractOrder } from '../types/scm'
+import type { ModelCode, ModelInfo, BomPart, Supplier, MasterPart, ContractOrder, ClientPartner } from '../types/scm'
 
 // 4대 표준 모델 마스터 정보
 export const MODELS_INFO: ModelInfo[] = [
@@ -1063,5 +1063,100 @@ export const INITIAL_CONTRACTS: ContractOrder[] = [
       'TAPI-9320T': 1
     },
     status: '접수완료'
+  }
+]
+
+
+// 매출거래처 (고객사 / 발주기관) 마스터
+export const INITIAL_CLIENTS: ClientPartner[] = [
+  {
+    id: 'CLI-001',
+    partnerType: 'CLIENT',
+    code: 'C-SEOUL-GN',
+    name: '서울특별시 강남구청',
+    businessNo: '211-83-00018',
+    ceo: '조성명 (구청장)',
+    category: '지자체',
+    department: '주민생활지원과',
+    manager: '김민수 주무관',
+    contact: '02-3423-5114',
+    email: 'minsu.kim@gangnam.go.kr',
+    address: '서울특별시 강남구 학동로 426 (삼성동, 강남구청)',
+    note: '관내 주민센터 무인발급기 총 32대 운용 중. 노후 기기 교체 우선 추진.'
+  },
+  {
+    id: 'CLI-002',
+    partnerType: 'CLIENT',
+    code: 'C-GG-SW',
+    name: '경기도 수원시청',
+    businessNo: '135-83-00024',
+    ceo: '이재준 (시장)',
+    category: '지자체',
+    department: '민원봉사과',
+    manager: '이지은 계장',
+    contact: '031-228-2114',
+    email: 'jieun.lee@suwon.go.kr',
+    address: '경기도 수원시 팔달구 효원로 241 (인계동)',
+    note: '수원역 365 민원센터 및 각 구청 대화면 32인치(9320) 중심 확대 설치.'
+  },
+  {
+    id: 'CLI-003',
+    partnerType: 'CLIENT',
+    code: 'C-SEOUL-SP',
+    name: '서울특별시 송파구청',
+    businessNo: '215-83-00031',
+    ceo: '서강석 (구청장)',
+    category: '지자체',
+    department: '민원여권과',
+    manager: '박성호 주무관',
+    contact: '02-2147-2000',
+    email: 'sh.park@songpa.go.kr',
+    address: '서울특별시 송파구 올림픽로 326 (신천동)',
+    note: '잠실역 지하상가 및 롯데월드몰 인근 신규 추가 수요 협의 중.'
+  },
+  {
+    id: 'CLI-004',
+    partnerType: 'CLIENT',
+    code: 'C-BS-HUD',
+    name: '부산광역시 해운대구청',
+    businessNo: '617-83-00045',
+    ceo: '김성수 (구청장)',
+    category: '지자체',
+    department: '총무과 민원행정팀',
+    manager: '최진우 주무관',
+    contact: '051-749-4000',
+    email: 'jw.choi@haeundae.go.kr',
+    address: '부산광역시 해운대구 중동2로 11 (중동)',
+    note: '해운대 백사장 안내센터 및 벡스코(BEXCO) 다중이용시설 배치.'
+  },
+  {
+    id: 'CLI-005',
+    partnerType: 'CLIENT',
+    code: 'C-KORAIL',
+    name: '한국철도공사(코레일)',
+    businessNo: '314-82-10020',
+    ceo: '한문희 (사장)',
+    category: '공기업',
+    department: '역사편의시설사업처',
+    manager: '윤승우 과장',
+    contact: '042-615-3114',
+    email: 'sw.yoon@korail.com',
+    address: '대전광역시 동구 중앙로 240 (정동, 철도기관 공동사옥)',
+    note: '전국 KTX 주요 역사 민원발급기 표준 규격 도입 추진.'
+  },
+  {
+    id: 'CLI-006',
+    partnerType: 'CLIENT',
+    code: 'C-NHIS',
+    name: '국민건강보험공단',
+    businessNo: '229-82-01450',
+    ceo: '정기석 (이사장)',
+    category: '공공기관',
+    department: '고객지원실',
+    manager: '정재훈 차장',
+    contact: '1577-1000',
+    email: 'jh.jung@nhis.or.kr',
+    address: '강원특별자치도 원주시 건강로 32 (반곡동)',
+    note: '지사별 민원실 자격득실확인서 발급용 표준기기 시범 설치.'
   }
 ]
