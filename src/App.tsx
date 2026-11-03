@@ -85,11 +85,8 @@ export default function App() {
       {/* Main Text Content */}
       <div className="relative z-10 text-center px-4">
         <h1 className="text-7xl sm:text-8xl md:text-9xl font-black tracking-tight text-white drop-shadow-[0_10px_30px_rgba(2,132,199,0.45)] animate-bob">
-          hello world
+          Hello world
         </h1>
-        <p className="mt-4 text-sky-950/75 font-semibold text-lg sm:text-2xl tracking-wide drop-shadow-xs">
-          ☁️ Blue Sky & Floating Clouds ☁️
-        </p>
       </div>
     </div>
   )
