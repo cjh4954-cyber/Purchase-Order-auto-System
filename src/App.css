@@ -1,0 +1,41 @@
+@keyframes drift {
+  0% {
+    transform: translateX(-350px);
+  }
+  100% {
+    transform: translateX(100vw);
+  }
+}
+
+@keyframes gentleBob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.cloud-drift-1 {
+  animation: drift 35s linear infinite;
+}
+
+.cloud-drift-2 {
+  animation: drift 50s linear infinite;
+}
+
+.cloud-drift-3 {
+  animation: drift 68s linear infinite;
+}
+
+.cloud-drift-4 {
+  animation: drift 85s linear infinite;
+}
+
+.cloud-drift-5 {
+  animation: drift 105s linear infinite;
+}
+
+.animate-bob {
+  animation: gentleBob 6s ease-in-out infinite;
+}
